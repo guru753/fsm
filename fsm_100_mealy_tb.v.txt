@@ -1,0 +1,31 @@
+module tb;
+  reg clk, rst, seq_in;
+  wire det_out;
+
+  fsm_100_mealy dut(clk, rst, seq_in, det_out);
+
+  initial clk = 0;
+  always #5 clk = ~clk;
+
+  initial begin
+    rst = 0;
+    seq_in = 0;
+
+    #13 rst = 1;      // release reset before next posedge
+
+    seq_in = 1;       // input = 1
+    #10 seq_in = 0;   // input = 0
+    #10 seq_in = 0;   // input = 0
+
+    #20 $finish;
+  end
+
+  initial begin
+    $monitor("time=%0t clk=%b rst=%b seq_in=%b state=%b det_out=%b",
+             $time, clk, rst, seq_in, dut.ps, det_out);
+  end
+   initial begin
+     $dumpfile("dump.vcd");
+     $dumpvars(0,tb);
+   end
+endmodule
